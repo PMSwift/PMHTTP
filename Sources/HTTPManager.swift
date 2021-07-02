@@ -1761,27 +1761,22 @@ public final class HTTPManagerMetricsCallback: NSObject {
 
 // MARK: - Private
 
-// Stored properties cannot be marked potentially unavailable with @unavailable.
-// Therefore we will use a custom enum for this.
-private enum MetricsCallbackWrapper {
-    case none
-    @available(iOS 10, macOS 10.12, tvOS 10, watchOS 3, *)
-    case some(HTTPManager.MetricsCallback)
+// Wraps a `MetricsCallback` because stored properties cannot be marked potentially unavailable with @unavailable.
+private struct MetricsCallbackWrapper {
+    static var none: MetricsCallbackWrapper { return MetricsCallbackWrapper() }
     
+    private var wrapped: Any?
+
     @available(iOS 10, macOS 10.12, tvOS 10, watchOS 3, *)
     init(_ metricsCallback: HTTPManager.MetricsCallback?) {
-        switch metricsCallback {
-        case .none: self = .none
-        case .some(let value): self = .some(value)
-        }
+        wrapped = metricsCallback
     }
+    
+    private init() {}
     
     @available(iOS 10, macOS 10.12, tvOS 10, watchOS 3, *)
     var asOptional: HTTPManager.MetricsCallback? {
-        switch self {
-        case .none: return .none
-        case .some(let value): return .some(value)
-        }
+        return wrapped as? HTTPManager.MetricsCallback
     }
 }
 
